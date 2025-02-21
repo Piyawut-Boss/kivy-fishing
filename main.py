@@ -35,7 +35,7 @@ class Fish(Image):
         self.spawn_rate = fish_data[fish_type]["spawn_rate"]  # อัตราการเกิด
         self.points = fish_data[fish_type]["points"]  # Add points for scoring
         self.size_hint = (None, None)
-        self.size = (100, 50)
+        self.size = (150, 75)  # Increased from (100, 50) to (150, 75)
         
         # กำหนดตำแหน่งเริ่มต้นแบบสุ่ม
         self.y = random.randint(100, 400)
