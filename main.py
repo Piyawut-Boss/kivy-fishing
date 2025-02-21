@@ -2,10 +2,22 @@ import random
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.image import Image
+from kivy.uix.label import Label
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.clock import Clock
 from kivy.graphics import Scale
 from kivy.core.window import Window  # ใช้ขนาดหน้าจอ
+
+class Hook(Image):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.source = "assets/hook.png"  # Add a hook.png to your assets folder
+        self.size_hint = (None, None)
+        self.size = (50, 50)
+        Window.bind(mouse_pos=self.on_mouse_move)
+
+    def on_mouse_move(self, window, pos):
+        self.pos = pos
 
 class Fish(Image):
     def __init__(self, fish_type, **kwargs):
@@ -13,14 +25,15 @@ class Fish(Image):
         
         # เลือกรูปภาพปลาและกำหนดค่าความเร็วและอัตราการเกิดตามประเภทปลา
         fish_data = {
-            "puffer-fish": {"image": "assets/puffer-fish.png", "speed": random.randint(3, 4), "spawn_rate": 5},
-            "summer": {"image": "assets/summer.png", "speed": random.randint(8, 9), "spawn_rate": 1},
-            "clown-fish": {"image": "assets/clown-fish.png", "speed": random.randint(3, 4), "spawn_rate": 5}
+            "puffer-fish": {"image": "assets/puffer-fish.png", "speed": random.randint(3, 4), "spawn_rate": 5, "points": 10},
+            "summer": {"image": "assets/summer.png", "speed": random.randint(8, 9), "spawn_rate": 1, "points": 30},
+            "clown-fish": {"image": "assets/clown-fish.png", "speed": random.randint(3, 4), "spawn_rate": 5, "points": 20}
         }
         
         self.source = fish_data[fish_type]["image"]
         self.speed = fish_data[fish_type]["speed"]  # ความเร็ว
         self.spawn_rate = fish_data[fish_type]["spawn_rate"]  # อัตราการเกิด
+        self.points = fish_data[fish_type]["points"]  # Add points for scoring
         self.size_hint = (None, None)
         self.size = (100, 50)
         
@@ -74,11 +87,55 @@ class FishingGame(RelativeLayout):
         self.background = Image(source="assets/background.png", allow_stretch=True, keep_ratio=False)
         self.add_widget(self.background)
 
-        # สร้างปลา 5 ตัวเริ่มต้นจากชนิดสุ่ม
+        # Add hook
+        self.hook = Hook()
+        self.add_widget(self.hook)
+        
+        # Add score
+        self.score = 0
+        self.score_label = Label(
+            text=f"Score: {self.score}",
+            pos_hint={'right': 0.95, 'top': 0.95},
+            size_hint=(None, None)
+        )
+        self.add_widget(self.score_label)
+        
+        # Create fish
+        self.fishes = []
+        self.spawn_initial_fish()
+        
+        # Bind click event
+        self.bind(on_touch_down=self.on_click)
+
+    def spawn_initial_fish(self):
         fish_types = ["puffer-fish", "summer", "clown-fish"]
-        self.fishes = [Fish(random.choice(fish_types)) for _ in range(10)]
-        for fish in self.fishes:
+        for _ in range(10):
+            fish = Fish(random.choice(fish_types))
+            self.fishes.append(fish)
             self.add_widget(fish)
+
+    def on_click(self, instance, touch):
+        for fish in self.fishes[:]:  # Use copy of list to avoid modification during iteration
+            if self.check_collision(self.hook, fish):
+                self.catch_fish(fish)
+
+    def check_collision(self, hook, fish):
+        return (hook.x < fish.x + fish.width and
+                hook.x + hook.width > fish.x and
+                hook.y < fish.y + fish.height and
+                hook.y + hook.height > fish.y)
+
+    def catch_fish(self, fish):
+        self.score += fish.points
+        self.score_label.text = f"Score: {self.score}"
+        self.remove_widget(fish)
+        self.fishes.remove(fish)
+        
+        # Spawn new fish
+        fish_types = ["puffer-fish", "summer", "clown-fish"]
+        new_fish = Fish(random.choice(fish_types))
+        self.add_widget(new_fish)
+        self.fishes.append(new_fish)
 
     def update(self, dt):
         for fish in self.fishes[:]:  
