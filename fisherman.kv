@@ -1,0 +1,145 @@
+#:kivy 2.0.0
+
+<FishermanGame>:
+    canvas.before:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: 'images/background.png'
+
+<Fish>:
+    size_hint: None, None
+
+<Boat>:
+    size_hint: None, None
+
+<Hook>:
+    size_hint: None, None
+
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.core.window import Window
+from kivy.clock import Clock
+from kivy.properties import NumericProperty, ObjectProperty, ListProperty, BooleanProperty
+from kivy.uix.image import Image
+from kivy.core.audio import SoundLoader
+from random import randrange
+import json
+
+Window.size = (1600, 900)
+
+class Fish(Image):
+    speed = NumericProperty(2)
+    direction = NumericProperty(1)  # 1 for right, -1 for left
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size = (120, 80)
+        self.source = 'images/fish_1_right.png'
+        self.x = randrange(100, 1400)
+        self.y = randrange(400, 800)
+        
+    def move(self, dt):
+        self.x += self.speed * self.direction
+        if self.x < 0:
+            self.direction = 1
+            self.source = 'images/fish_1_right.png'
+        elif self.x > Window.width - self.width:
+            self.direction = -1
+            self.source = 'images/fish_1_left.png'
+
+class Boat(Image):
+    speed = NumericProperty(3)
+    caught_fishes = NumericProperty(0)
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size = (250, 130)
+        self.source = 'images/boat_left.png'
+        self.x = 700
+        self.y = 50
+
+class Hook(Image):
+    is_moving = BooleanProperty(False)
+    speed = NumericProperty(4)
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size = (15, 30)
+        self.source = 'images/hook.png'
+
+class FishermanGame(Widget):
+    boat = ObjectProperty(None)
+    hook = ObjectProperty(None)
+    fishes = ListProperty([])
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.boat = Boat()
+        self.hook = Hook()
+        self.add_widget(self.boat)
+        self.add_widget(self.hook)
+        
+        # Create 5 fish
+        for _ in range(5):
+            fish = Fish()
+            self.fishes.append(fish)
+            self.add_widget(fish)
+        
+        # Set up game loop
+        Clock.schedule_interval(self.update, 1.0/60.0)
+        Window.bind(on_key_down=self.on_key_down)
+        
+    def on_key_down(self, window, key, *args):
+        if key == 276:  # Left arrow
+            self.boat.x = max(0, self.boat.x - self.boat.speed)
+            self.boat.source = 'images/boat_left.png'
+        elif key == 275:  # Right arrow
+            self.boat.x = min(Window.width - self.boat.width, self.boat.x + self.boat.speed)
+            self.boat.source = 'images/boat_right.png'
+        elif key == 32:  # Space
+            self.hook.is_moving = True
+    
+    def update(self, dt):
+        # Update fish positions
+        for fish in self.fishes:
+            fish.move(dt)
+        
+        # Update hook
+        if self.hook.is_moving:
+            if not hasattr(self.hook, 'going_down'):
+                self.hook.going_down = True
+            
+            if self.hook.going_down:
+                self.hook.y -= self.hook.speed
+                if self.hook.y < 0:
+                    self.hook.going_down = False
+            else:
+                self.hook.y += self.hook.speed
+                if self.hook.y > self.boat.y:
+                    self.hook.is_moving = False
+                    self.hook.y = self.boat.y
+        else:
+            self.hook.x = self.boat.x + self.boat.width/2
+            self.hook.y = self.boat.y
+            
+        # Check for collisions
+        self.check_collisions()
+    
+    def check_collisions(self):
+        for fish in self.fishes[:]:
+            if (self.hook.is_moving and
+                self.hook.collide_widget(fish)):
+                self.boat.caught_fishes += 1
+                self.fishes.remove(fish)
+                self.remove_widget(fish)
+                new_fish = Fish()
+                self.fishes.append(new_fish)
+                self.add_widget(new_fish)
+
+class FishermanApp(App):
+    def build(self):
+        return FishermanGame()
+
+if __name__ == '__main__':
+    FishermanApp().run()
