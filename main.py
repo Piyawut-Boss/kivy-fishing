@@ -6,12 +6,16 @@ from fishing_line import FishLine
 from hook import Hook
 from info_json import *
 
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.core.window import Window
+
+Window.size = (1080, 720)
 
 def random_fish_spawn():
-    x = random.randrange(100, 1400)
-    y = random.randrange(400, 800)
+    x = random.randrange(100, 980)
+    y = random.randrange(300, 600)
     return x, y
-
 
 json_data = read_json()
 SIZE = (1080, 720)
@@ -19,9 +23,10 @@ pygame.init()
 screen = pygame.display.set_mode(SIZE)
 
 background = pygame.image.load("images/background.png")
-background = pygame.transform.scale(background,(10000,900))
+background = pygame.transform.scale(background,(10000,720))
 
 boat = Boat()
+
 
 x_spawn, y_spawn = random_fish_spawn()
 fish = Fish(x_spawn, y_spawn)
@@ -79,7 +84,7 @@ while running:
 
     seconds = pygame.time.get_ticks() // 1000  # NOQA
 
-    transparent_surface = pygame.Surface((1600, 900))
+    transparent_surface = pygame.Surface((1080, 720))
     fish_hitbox_draw = pygame.draw.rect(transparent_surface, (0, 0, 0), (fish.x_pos, fish.y_pos + 27, 120, 40), 1)
     hook_hitbox.x, hook_hitbox.y = fisherman_line.tip_of_the_rod - 10, hook.y_pos
     hook_hitbox_draw = pygame.draw.rect(transparent_surface, (0, 0, 0), (hook_hitbox.x, hook_hitbox.y, 17, 33), 1)
