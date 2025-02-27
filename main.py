@@ -14,7 +14,7 @@ def random_fish_spawn():
 
 
 json_data = read_json()
-SIZE = (1600, 900)
+SIZE = (1080, 720)
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
 
