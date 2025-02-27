@@ -18,7 +18,7 @@ class Hook:
 
     def drop_hook(self):
         self.y_pos += Hook.__DROP_SPEED
-        if self.y_pos >= 900:
+        if self.y_pos >= 700:
             self.bottom_reached = True
             self.is_caught = False
 
