@@ -6,6 +6,12 @@ from fishing_line import FishLine
 from hook import Hook
 from info_json import *
 
+# Add color constants at the top after imports
+DARK_GRAY = (40, 40, 40)
+LIGHT_BLUE = (100, 200, 255)
+WHITE = (255, 255, 255)
+ORANGE = (255, 165, 0)
+GREEN = (50, 205, 50)
 
 def random_fish_spawn():
     x = random.randrange(100, 1080)
@@ -40,13 +46,13 @@ fish_directions = [left_picture_fish if fish.x_pos <= SIZE[0] // 2 else right_pi
 """On screen shits"""
 font = pygame.font.Font(None, 30)
 caught_fishes_count = 0
-fps = int(1000 / pygame.time.Clock().tick(60))
+# Remove fps calculation
 # ------------------------
 fish_hitbox = pygame.Rect((fishes[0].x_pos, fishes[0].y_pos, 0, 0))  # NOQA
 hook_hitbox = pygame.Rect((fisherman_line.tip_of_the_rod, hook.y_pos, 0, 0))  # NOQA
 # caught_fish ---------------
 caught_fish = pygame.image.load("images/fish_1_left.png")
-caught_fish = pygame.transform.scale(caught_fish, (120, 80))
+caught_fish = pygame.transform.scale(caught_fish, (80, 50))
 caught_fish = pygame.transform.rotate(caught_fish, -90)
 # ----------------------------
 
@@ -57,19 +63,20 @@ running = True
 is_fish_caught = False
 while running:
     pygame.time.Clock().tick(60)
-
     screen.blit(background, (0, 0))
-    text_fps = font.render(str(f"fps: {fps}"), True, (255, 0, 0))
-    screen.blit(text_fps, (10, 10))
-    caught_fishes = font.render(str(f"caught fishes: {boat.caught_fishes}"), True, (255, 0, 0))
-    screen.blit(caught_fishes, (100, 10))
-    info_record = font.render(str(f"previous record: {json_data['best_result']}"), True, (255, 0, 0))
-    screen.blit(info_record, (280, 10))
-
-    # Calculate and display elapsed time
+    
+    # Calculate seconds
     seconds = (pygame.time.get_ticks() - start_ticks) // 1000
-    elapsed_time = font.render(str(f"Time: {seconds}s"), True, (255, 0, 0))
-    screen.blit(elapsed_time, (500, 10))
+
+    # Draw stats directly without FPS
+    text_fish = font.render(f"Fish: {boat.caught_fishes}", True, WHITE)
+    text_record = font.render(f"Record: {json_data['best_result']}", True, WHITE)
+    text_time = font.render(f"Time: {seconds}s", True, WHITE)
+    
+    # Adjust positions (removed FPS, moved others left)
+    screen.blit(text_fish, (10, 10))
+    screen.blit(text_record, (160, 10))
+    screen.blit(text_time, (310, 10))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

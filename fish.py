@@ -3,8 +3,8 @@ import pygame
 
 class Fish:
     __SWIM_SPEED = 2
-    __FISH_WIDTH = 120
-    __FISH_HEIGHT = 80
+    __FISH_WIDTH = 80
+    __FISH_HEIGHT = 50
     __FISH_FLOAT_SPEED = 1
 
     def __init__(self, x_pos: int or float, y_pos: int or float):
