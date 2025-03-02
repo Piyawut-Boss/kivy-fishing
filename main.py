@@ -13,6 +13,11 @@ WHITE = (255, 255, 255)
 ORANGE = (255, 165, 0)
 GREEN = (50, 205, 50)
 
+# Add new colors for menu
+MENU_BLUE = (65, 105, 225)
+MENU_WHITE = (255, 255, 255)
+MENU_HOVER = (100, 149, 237)
+
 def random_fish_spawn():
     x = random.randrange(100, 1080)
     y = random.randrange(300, 720)
@@ -59,7 +64,51 @@ caught_fish = pygame.transform.rotate(caught_fish, -90)
 # Add a timer to display elapsed time
 start_ticks = pygame.time.get_ticks()
 
-running = True
+def draw_menu_button(screen, text, x, y, width, height, color):
+    pygame.draw.rect(screen, color, (x, y, width, height))
+    text_surface = font.render(text, True, MENU_WHITE)
+    text_rect = text_surface.get_rect(center=(x + width/2, y + height/2))
+    screen.blit(text_surface, text_rect)
+    return pygame.Rect(x, y, width, height)
+
+# Add menu loop before main game
+def show_menu():
+    menu_running = True
+    while menu_running:
+        screen.blit(background, (0, 0))
+        
+        # Draw title
+        title_font = pygame.font.Font(None, 74)
+        title = title_font.render("Fisherman", True, MENU_WHITE)
+        screen.blit(title, (SIZE[0]//2 - title.get_width()//2, 200))
+
+        # Create buttons
+        play_button = draw_menu_button(screen, "Play", SIZE[0]//2 - 100, 350, 200, 50, MENU_BLUE)
+        quit_button = draw_menu_button(screen, "Quit", SIZE[0]//2 - 100, 450, 200, 50, MENU_BLUE)
+
+        # Handle mouse hover
+        mouse_pos = pygame.mouse.get_pos()
+        if play_button.collidepoint(mouse_pos):
+            draw_menu_button(screen, "Play", SIZE[0]//2 - 100, 350, 200, 50, MENU_HOVER)
+        if quit_button.collidepoint(mouse_pos):
+            draw_menu_button(screen, "Quit", SIZE[0]//2 - 100, 450, 200, 50, MENU_HOVER)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button.collidepoint(event.pos):
+                    return True
+                if quit_button.collidepoint(event.pos):
+                    return False
+
+        pygame.display.flip()
+        pygame.time.Clock().tick(60)
+
+# Add menu before main game loop
+should_start_game = show_menu()
+running = should_start_game
+
 is_fish_caught = False
 while running:
     pygame.time.Clock().tick(60)
