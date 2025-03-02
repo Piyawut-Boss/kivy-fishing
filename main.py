@@ -6,6 +6,7 @@ from fishing_line import FishLine
 from hook import Hook
 from info_json import *
 from widgets import Button, TextLabel, GameHUD
+from widgets import *
 
 # Add color constants at the top after imports
 DARK_GRAY = (40, 40, 40)
@@ -83,6 +84,11 @@ class GameMenu:
 # Initialize game objects
 game_menu = GameMenu(SIZE)
 game_hud = GameHUD()
+boat_widget = BoatWidget(boat)
+fish_widgets = [FishWidget(fish) for fish in fishes]
+hook_line_widget = HookLineWidget(fisherman_line, hook)
+caught_fish_widget = CaughtFishWidget()
+game_hud = GameHUD()
 
 def show_menu():
     menu_running = True
@@ -117,15 +123,9 @@ while running:
     # Calculate seconds
     seconds = (pygame.time.get_ticks() - start_ticks) // 1000
 
-    # Draw stats directly without FPS
-    text_fish = font.render(f"Fish: {boat.caught_fishes}", True, WHITE)
-    text_record = font.render(f"Record: {json_data['best_result']}", True, WHITE)
-    text_time = font.render(f"Time: {seconds}s", True, WHITE)
-    
-    # Adjust positions (removed FPS, moved others left)
-    screen.blit(text_fish, (10, 10))
-    screen.blit(text_record, (160, 10))
-    screen.blit(text_time, (310, 10))
+    # Update HUD
+    game_hud.update(boat.caught_fishes, json_data['best_result'], seconds)
+    game_hud.draw(screen)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -134,39 +134,40 @@ while running:
             if event.key == pygame.K_SPACE:
                 hook.is_hook_moving = True
 
+    # Update boat
+    boat_facing_left = True
     if (pygame.key.get_pressed()[pygame.K_a] or pygame.key.get_pressed()[
         pygame.K_LEFT]) and not hook.is_hook_moving:  # NOQA
         boat.move_left()
         fisherman_line.rotate_fisherman_left(boat)
-        boat_look_direction = left_picture_boat
+        boat_facing_left = True
     elif (pygame.key.get_pressed()[pygame.K_d] or pygame.key.get_pressed()[pygame.K_RIGHT]) and not hook.is_hook_moving:
         boat.move_right(SIZE[0])
         fisherman_line.rotate_fisherman_right(boat)
-        boat_look_direction = right_picture_boat
+        boat_facing_left = False
 
-    seconds = pygame.time.get_ticks() // 1000  # NOQA
+    boat_widget.update(boat_facing_left)
+    boat_widget.draw(screen)
 
     transparent_surface = pygame.Surface((1600, 900))
     hook_hitbox.x, hook_hitbox.y = fisherman_line.tip_of_the_rod - 10, hook.y_pos
     hook_hitbox_draw = pygame.draw.rect(transparent_surface, (0, 0, 0), (hook_hitbox.x, hook_hitbox.y, 17, 33), 1)
 
     if not is_fish_caught:
-        for i, fish in enumerate(fishes):
-            fish_hitbox_draw = pygame.draw.rect(transparent_surface, (0, 0, 0), (fish.x_pos, fish.y_pos + 27, 120, 40), 1)
+        for i, fish_widget in enumerate(fish_widgets):
             if fish_directions[i] == left_picture_fish:
-                fish.swim_left(seconds, fish_hitbox)
-                if fish.check_left_wall():
+                fishes[i].swim_left(seconds, fish_hitbox)
+                if fishes[i].check_left_wall():
                     fish_directions[i] = right_picture_fish
-            elif fish_directions[i] == right_picture_fish:
-                fish.swim_right(seconds, fish_hitbox)
-                screen_width = SIZE[0]
-                if fish.check_right_wall(screen_width):
+            else:
+                fishes[i].swim_right(seconds, fish_hitbox)
+                if fishes[i].check_right_wall(SIZE[0]):
                     fish_directions[i] = left_picture_fish
-            fish_image = screen.blit(fish_directions[i], (fish.x_pos, fish.y_pos))
+                    
+            fish_widget.update('left' if fish_directions[i] == left_picture_fish else 'right')
+            fish_widget.draw(screen)
             
-            # Update hitbox for each fish and check collision
-            fish_hitbox = pygame.Rect((fish.x_pos, fish.y_pos + 27, 120, 40))
-            if fish_hitbox.colliderect(hook_hitbox_draw):
+            if fish_widget.hitbox.colliderect(hook_hitbox_draw):
                 is_fish_caught = True
                 caught_fish_index = i
                 break
@@ -183,10 +184,9 @@ while running:
             pygame.draw.line(screen, (255, 0, 0), (fisherman_line.tip_of_the_rod, boat.y + 17),
                              (fisherman_line.tip_of_the_rod, hook.y_pos))
 
-    pygame.draw.line(screen, (255, 0, 0), (fisherman_line.tip_of_the_rod, boat.y + 17),
-                     (fisherman_line.tip_of_the_rod, hook.y_pos))
+    hook_line_widget.draw(screen, boat.y)
     if is_fish_caught:
-        screen.blit(caught_fish, (hook_hitbox.x - 23, hook_hitbox.y + 20))
+        caught_fish_widget.draw(screen, hook_hitbox.x, hook_hitbox.y)
         hook.caught_fish(fisherman_line)
         if hook.is_caught:
             fishes[caught_fish_index].increase_speed_fish_after_caught()

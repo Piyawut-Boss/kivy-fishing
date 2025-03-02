@@ -45,9 +45,19 @@ class TextLabel(Widget):
         text_surface = self.font.render(self.text, True, self.color)
         screen.blit(text_surface, self.rect)
 
-class BoatWidget(Widget):
-    def __init__(self, x, y, boat):
-        super().__init__(x, y, 200, 100)
+class SpriteWidget(Widget):
+    """Base class for all game sprites"""
+    def __init__(self, x, y, width, height):
+        super().__init__(x, y, width, height)
+        self.hitbox = pygame.Rect(x, y, width, height)
+
+    def update_hitbox(self, x, y):
+        self.hitbox.x = x
+        self.hitbox.y = y
+
+class BoatWidget(SpriteWidget):
+    def __init__(self, boat):
+        super().__init__(boat.x, boat.y, 200, 100)
         self.boat = boat
         self.left_image, self.right_image = boat.load_boat()
         self.current_image = self.left_image
@@ -55,24 +65,45 @@ class BoatWidget(Widget):
     def draw(self, screen):
         screen.blit(self.current_image, (self.boat.x, self.boat.y))
         
-    def face_left(self):
-        self.current_image = self.left_image
-        
-    def face_right(self):
-        self.current_image = self.right_image
+    def update(self, facing_left):
+        self.current_image = self.left_image if facing_left else self.right_image
+        self.update_hitbox(self.boat.x, self.boat.y)
 
-class FishWidget(Widget):
-    def __init__(self, fish, initial_direction='left'):
+class FishWidget(SpriteWidget):
+    def __init__(self, fish):
         super().__init__(fish.x_pos, fish.y_pos, 80, 50)
         self.fish = fish
         self.left_image, self.right_image = fish.load_pictures()
-        self.current_image = self.left_image if initial_direction == 'left' else self.right_image
+        self.current_image = self.left_image
         
     def draw(self, screen):
         screen.blit(self.current_image, (self.fish.x_pos, self.fish.y_pos))
         
-    def update_direction(self, direction):
+    def update(self, direction):
         self.current_image = self.left_image if direction == 'left' else self.right_image
+        self.update_hitbox(self.fish.x_pos, self.fish.y_pos + 27)  # Adjust hitbox position
+
+class HookLineWidget(Widget):
+    def __init__(self, fishing_line, hook):
+        super().__init__(0, 0, 1, 1)
+        self.fishing_line = fishing_line
+        self.hook = hook
+        self.color = (255, 0, 0)
+        
+    def draw(self, screen, boat_y):
+        start_pos = (self.fishing_line.tip_of_the_rod, boat_y + 17)
+        end_pos = (self.fishing_line.tip_of_the_rod, self.hook.y_pos)
+        pygame.draw.line(screen, self.color, start_pos, end_pos)
+
+class CaughtFishWidget(Widget):
+    def __init__(self):
+        super().__init__(0, 0, 80, 50)
+        self.image = pygame.image.load("images/fish_1_left.png")
+        self.image = pygame.transform.scale(self.image, (80, 50))
+        self.image = pygame.transform.rotate(self.image, -90)
+        
+    def draw(self, screen, x, y):
+        screen.blit(self.image, (x - 23, y + 20))
 
 class FishingLineWidget(Widget):
     def __init__(self, fishing_line, color=(255, 0, 0)):
