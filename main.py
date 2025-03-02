@@ -7,6 +7,9 @@ from hook import Hook
 from info_json import *
 from widgets import Button, TextLabel, GameHUD
 from widgets import *
+from game_state import GameStateManager, GameState
+from event_manager import EventManager
+from fishing_mechanics import FishingMechanics
 
 # Add color constants at the top after imports
 DARK_GRAY = (40, 40, 40)
@@ -90,6 +93,22 @@ hook_line_widget = HookLineWidget(fisherman_line, hook)
 caught_fish_widget = CaughtFishWidget()
 game_hud = GameHUD()
 
+# Initialize managers
+game_state = GameStateManager()
+event_manager = EventManager()
+fishing_mechanics = FishingMechanics(event_manager)
+
+# Add new widgets
+depth_meter = DepthMeterWidget(10, 100, 200)
+fishing_stats = FishingStatsWidget(10, 400)
+
+# Add callbacks
+def on_fish_caught(fish_type, points):
+    fishing_stats.update_stats(fish_type)
+    game_hud.update(boat.caught_fishes + points, json_data['best_result'], seconds)
+
+event_manager.add_listener('fish_caught', on_fish_caught)
+
 def show_menu():
     menu_running = True
     while menu_running:
@@ -168,8 +187,9 @@ while running:
             fish_widget.draw(screen)
             
             if fish_widget.hitbox.colliderect(hook_hitbox_draw):
-                is_fish_caught = True
-                caught_fish_index = i
+                if fishing_mechanics.attempt_catch(hook.y_pos):
+                    is_fish_caught = True
+                    caught_fish_index = i
                 break
 
         line = pygame.Rect((fisherman_line.tip_of_the_rod, boat.y + 17, 1, fisherman_line.advance_line))
@@ -204,7 +224,13 @@ while running:
         pygame.time.wait(3000)
         running = False
 
-    screen.blit(boat_look_direction, (boat.x, boat.y))
+    # Update depth meter
+    depth_meter.update(hook.y_pos)
+    depth_meter.draw(screen)
+    
+    # Update fishing stats
+    fishing_stats.draw(screen)
+
     """
     fisherman_line.tip_of_the_rod - 10 === hook knot position
     hook.y_pos if hook.is_hook_moving else fisherman_line.advance_line + 62

@@ -153,3 +153,41 @@ class GameHUD:
         self.fish_counter.draw(screen)
         self.record_label.draw(screen)
         self.time_label.draw(screen)
+
+class DepthMeterWidget(Widget):
+    def __init__(self, x, y, height):
+        super().__init__(x, y, 30, height)
+        self.max_depth = 700
+        self.current_depth = 0
+        self.color = (0, 191, 255)
+        
+    def update(self, hook_depth):
+        self.current_depth = hook_depth
+        
+    def draw(self, screen):
+        # Draw depth meter background
+        pygame.draw.rect(screen, (100, 100, 100), self.rect)
+        # Draw current depth indicator
+        depth_height = (self.current_depth / self.max_depth) * self.rect.height
+        pygame.draw.rect(screen, self.color, 
+                        (self.rect.x, self.rect.y + self.rect.height - depth_height,
+                         self.rect.width, depth_height))
+
+class FishingStatsWidget(Widget):
+    def __init__(self, x, y):
+        super().__init__(x, y, 200, 100)
+        self.stats = {
+            'common': 0,
+            'rare': 0,
+            'legendary': 0
+        }
+        
+    def update_stats(self, fish_type):
+        self.stats[fish_type] += 1
+        
+    def draw(self, screen):
+        y_offset = 0
+        for fish_type, count in self.stats.items():
+            text = f"{fish_type.title()}: {count}"
+            TextLabel(self.rect.x, self.rect.y + y_offset, text, (255, 255, 255)).draw(screen)
+            y_offset += 30
