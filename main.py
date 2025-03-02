@@ -5,6 +5,7 @@ from fish import Fish
 from fishing_line import FishLine
 from hook import Hook
 from info_json import *
+from widgets import Button, TextLabel, GameHUD
 
 # Add color constants at the top after imports
 DARK_GRAY = (40, 40, 40)
@@ -64,42 +65,41 @@ caught_fish = pygame.transform.rotate(caught_fish, -90)
 # Add a timer to display elapsed time
 start_ticks = pygame.time.get_ticks()
 
-def draw_menu_button(screen, text, x, y, width, height, color):
-    pygame.draw.rect(screen, color, (x, y, width, height))
-    text_surface = font.render(text, True, MENU_WHITE)
-    text_rect = text_surface.get_rect(center=(x + width/2, y + height/2))
-    screen.blit(text_surface, text_rect)
-    return pygame.Rect(x, y, width, height)
+class GameMenu:
+    def __init__(self, screen_size):
+        self.title = TextLabel(screen_size[0]//2 - 100, 200, "Fisherman", WHITE, 74)
+        self.play_button = Button(screen_size[0]//2 - 100, 350, 200, 50, "Play", MENU_BLUE, MENU_HOVER)
+        self.quit_button = Button(screen_size[0]//2 - 100, 450, 200, 50, "Quit", MENU_BLUE, MENU_HOVER)
 
-# Add menu loop before main game
+    def draw(self, screen):
+        self.title.draw(screen)
+        self.play_button.draw(screen)
+        self.quit_button.draw(screen)
+
+    def handle_mouse(self, pos):
+        self.play_button.is_hovered = self.play_button.rect.collidepoint(pos)
+        self.quit_button.is_hovered = self.quit_button.rect.collidepoint(pos)
+
+# Initialize game objects
+game_menu = GameMenu(SIZE)
+game_hud = GameHUD()
+
 def show_menu():
     menu_running = True
     while menu_running:
         screen.blit(background, (0, 0))
         
-        # Draw title
-        title_font = pygame.font.Font(None, 74)
-        title = title_font.render("Fisherman", True, MENU_WHITE)
-        screen.blit(title, (SIZE[0]//2 - title.get_width()//2, 200))
-
-        # Create buttons
-        play_button = draw_menu_button(screen, "Play", SIZE[0]//2 - 100, 350, 200, 50, MENU_BLUE)
-        quit_button = draw_menu_button(screen, "Quit", SIZE[0]//2 - 100, 450, 200, 50, MENU_BLUE)
-
-        # Handle mouse hover
         mouse_pos = pygame.mouse.get_pos()
-        if play_button.collidepoint(mouse_pos):
-            draw_menu_button(screen, "Play", SIZE[0]//2 - 100, 350, 200, 50, MENU_HOVER)
-        if quit_button.collidepoint(mouse_pos):
-            draw_menu_button(screen, "Quit", SIZE[0]//2 - 100, 450, 200, 50, MENU_HOVER)
+        game_menu.handle_mouse(mouse_pos)
+        game_menu.draw(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if play_button.collidepoint(event.pos):
+                if game_menu.play_button.rect.collidepoint(event.pos):
                     return True
-                if quit_button.collidepoint(event.pos):
+                if game_menu.quit_button.rect.collidepoint(event.pos):
                     return False
 
         pygame.display.flip()
@@ -198,8 +198,8 @@ while running:
 
     # Add a game over condition when a certain number of fish are caught
     if boat.caught_fishes >= 10:
-        game_over_text = font.render("Game Over! You Win!", True, (255, 0, 0))
-        screen.blit(game_over_text, (SIZE[0] // 2 - 100, SIZE[1] // 2))
+        game_over = TextLabel(SIZE[0] // 2 - 100, SIZE[1] // 2, "Game Over! You Win!", (255, 0, 0), 48)
+        game_over.draw(screen)
         pygame.display.flip()
         pygame.time.wait(3000)
         running = False
