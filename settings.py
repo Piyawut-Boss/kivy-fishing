@@ -1,0 +1,16 @@
+SIZE = (1080, 720)
+BG_COLOR = (0, 0, 0)
+FISH_COUNT = 5
+HOOK_SPEED = 4
+BOAT_SPEED = 5
+FISH_SPEED = 2
+
+# Game states
+MENU = 0
+PLAYING = 1
+PAUSED = 2
+GAME_OVER = 3
+
+# Colors
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
