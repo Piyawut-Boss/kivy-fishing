@@ -56,6 +56,7 @@ fish_directions = [left_picture_fish if fish.x_pos <= SIZE[0] // 2 else right_pi
 """On screen shits"""
 font = pygame.font.Font(None, 30)
 caught_fishes_count = 0
+level = 1  # Initialize level
 # Remove fps calculation
 # ------------------------
 fish_hitbox = pygame.Rect((fishes[0].x_pos, fishes[0].y_pos, 0, 0))  # NOQA
@@ -216,9 +217,13 @@ while running:
             x_spawn, y_spawn = random_fish_spawn()
             fishes[caught_fish_index].x_pos, fishes[caught_fish_index].y_pos = x_spawn, y_spawn
 
+            # Update level
+            if boat.caught_fishes % 10 == 0:
+                level += 1
+
     # Add a game over condition when a certain number of fish are caught
     if boat.caught_fishes >= 10:
-        game_over = TextLabel(SIZE[0] // 2 - 100, SIZE[1] // 2, "Game Over! You Win!", (255, 0, 0), 48)
+        game_over = TextLabel(SIZE[0] // 2 - 100, SIZE[1] // 2, "You Win!", (255, 0, 0), 48)
         game_over.draw(screen)
         pygame.display.flip()
         pygame.time.wait(3000)
@@ -230,6 +235,10 @@ while running:
     
     # Update fishing stats
     fishing_stats.draw(screen)
+
+    # Display level at the top right corner
+    level_text = font.render(f"Level: {level}", True, WHITE)
+    screen.blit(level_text, (SIZE[0] - 150, 10))
 
     """
     fisherman_line.tip_of_the_rod - 10 === hook knot position
