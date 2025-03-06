@@ -16,7 +16,7 @@ GREEN = (50, 205, 50)
 
 def random_fish_spawn():
     x = random.randrange(100, 1080)
-    y = random.randrange(300, 720)
+    y = random.randrange(300, 600)
     return x, y
 
 def spawn_fish(fish_type=None):
@@ -32,7 +32,7 @@ pygame.init()
 screen = pygame.display.set_mode(SIZE)
 
 background = pygame.image.load("images/background.png")
-background = pygame.transform.scale(background, (10000, 900))
+background = pygame.transform.scale(background, SIZE)  # ปรับขนาดให้พอดีกับหน้าจอ (1080, 720)
 
 boat = Boat()
 
