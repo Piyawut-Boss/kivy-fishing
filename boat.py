@@ -1,6 +1,5 @@
 import pygame
 
-
 class Boat:
     __MOVE_SPEED = 3
     __BOAT_WIDTH = 250
@@ -10,6 +9,7 @@ class Boat:
         self.x = x
         self.y = y
         self.caught_fishes = 0
+        self.direction = "left"  # กำหนดให้เรือหันซ้ายเป็นค่าเริ่มต้น
 
     @staticmethod
     def load_boat():
@@ -22,10 +22,12 @@ class Boat:
     def move_left(self):
         if self.x > 0:
             self.x -= Boat.__MOVE_SPEED
+            self.direction = "left"  # อัปเดตให้เรือหันไปทางซ้าย
 
     def move_right(self, screen_width: int):
         if self.x < screen_width - Boat.__BOAT_WIDTH:
             self.x += Boat.__MOVE_SPEED
+            self.direction = "right"  # อัปเดตให้เรือหันไปทางขวา
 
     def caught_fish(self):
         self.caught_fishes += 1
