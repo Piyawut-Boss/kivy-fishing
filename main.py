@@ -1,7 +1,7 @@
 import random
 import pygame
 from boat import Boat
-from fish import Fish
+from fish import Fish, Shark  # เพิ่มการนำเข้า Shark
 from fishing_line import FishLine
 from hook import Hook
 from info_json import *
@@ -19,6 +19,13 @@ def random_fish_spawn():
     y = random.randrange(300, 720)
     return x, y
 
+def spawn_fish(fish_type=None):
+    if fish_type is None:
+        fish_type = random.choice(["fish", "shark"])
+    x_pos, y_pos = random_fish_spawn()
+
+    return Fish(x_pos, y_pos) if fish_type == "fish" else Shark(x_pos, y_pos)
+
 json_data = read_json()
 SIZE = (1080, 720)
 pygame.init()
@@ -31,8 +38,7 @@ boat = Boat()
 
 fishes = []
 for _ in range(5):
-    x_spawn, y_spawn = random_fish_spawn()
-    fishes.append(Fish(x_spawn, y_spawn))
+    fishes.append(spawn_fish())
 
 fisherman_line = FishLine(boat)
 hook = Hook(boat)
@@ -90,7 +96,8 @@ if menu_action == "start":
                 if event.key == pygame.K_SPACE:
                     hook.is_hook_moving = True
 
-        if (pygame.key.get_pressed()[pygame.K_a] or pygame.key.get_pressed()[pygame.K_LEFT]) and not hook.is_hook_moving:  # NOQA
+        if (pygame.key.get_pressed()[pygame.K_a] or pygame.key.get_pressed()[
+            pygame.K_LEFT]) and not hook.is_hook_moving:  # NOQA
             boat.move_left()
             fisherman_line.rotate_fisherman_left()
             boat_look_direction = left_picture_boat
@@ -117,10 +124,8 @@ if menu_action == "start":
                     screen_width = SIZE[0]
                     if fish.check_right_wall(screen_width):
                         fish_directions[i] = left_picture_fish
-                fish_image = screen.blit(fish_directions[i], (fish.x_pos, fish.y_pos))
-                
-                # Ensure all fish are displayed
-                fish_image = screen.blit(fish_directions[i], (fish.x_pos, fish.y_pos))
+                fish_image = fish.right_image if fish_directions[i] == right_picture_fish else fish.left_image
+                screen.blit(fish_image, (fish.x_pos, fish.y_pos))
                 
                 # Update hitbox for each fish and check collision
                 fish_hitbox = pygame.Rect((fish.x_pos, fish.y_pos + 27, 120, 40))
@@ -144,7 +149,10 @@ if menu_action == "start":
         pygame.draw.line(screen, (255, 0, 0), (fisherman_line.tip_of_the_rod, boat.y + 17),
                          (fisherman_line.tip_of_the_rod, hook.y_pos))
         if is_fish_caught:
-            screen.blit(caught_fish, (hook_hitbox.x - 23, hook_hitbox.y + 20))
+            if caught_fish_index is not None and 0 <= caught_fish_index < len(fishes):
+                caught_fish = fishes[caught_fish_index].left_image  # หรือ right_image ตามทิศทาง
+                caught_fish_rotated = pygame.transform.rotate(caught_fish, -90)  # หมุนปลาหัวขึ้น
+                screen.blit(caught_fish_rotated, (hook_hitbox.x - 23, hook_hitbox.y + 20))
             hook.caught_fish(fisherman_line)
             if hook.is_caught:
                 fishes[caught_fish_index].increase_speed_fish_after_caught()
@@ -152,8 +160,7 @@ if menu_action == "start":
 
                 # แทนที่ปลาตัวที่ถูกจับด้วยตัวใหม่
                 if caught_fish_index is not None and 0 <= caught_fish_index < len(fishes):
-                    x_spawn, y_spawn = random_fish_spawn()
-                    fishes[caught_fish_index] = Fish(x_spawn, y_spawn)  # เปลี่ยนเฉพาะปลาตัวที่ถูกจับ
+                    fishes[caught_fish_index] = spawn_fish("shark" if isinstance(fishes[caught_fish_index], Shark) else "fish")
 
                 is_fish_caught = False
                 caught_fish_index = None  # รีเซ็ตค่าให้พร้อมสำหรับรอบต่อไป
