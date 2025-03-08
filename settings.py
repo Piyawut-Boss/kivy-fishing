@@ -1,16 +1,16 @@
-SIZE = (1080, 720)
-BG_COLOR = (0, 0, 0)
-FISH_COUNT = 5
-HOOK_SPEED = 4
-BOAT_SPEED = 5
-FISH_SPEED = 2
+SIZE = (1080, 720) # กำหนดขนาดหน้าจอ
+BG_COLOR = (0, 0, 0) # กำหนดสีพื้นหลัง
+FISH_COUNT = 5 # กำหนดจำนวนปลา
+HOOK_SPEED = 4 # กำหนดความเร็วของเบ็ด
+BOAT_SPEED = 5 # กำหนดความเร็วของเรือ
+FISH_SPEED = 2 # กำหนดความเร็วของปลา
 
 # Game states
-MENU = 0
-PLAYING = 1
-PAUSED = 2
-GAME_OVER = 3
+MENU = 0 # กำหนดสถานะเริ่มต้นของเกม
+PLAYING = 1 # กำหนดสถานะเล่นเกม
+PAUSED = 2 # กำหนดสถานะหยุดเกม
+GAME_OVER = 3 # กำหนดสถานะจบเกม
 
 # Colors
-WHITE = (255, 255, 255)
+WHITE = (255, 255, 255) 
 RED = (255, 0, 0)
