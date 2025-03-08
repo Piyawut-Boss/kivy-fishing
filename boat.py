@@ -1,33 +1,28 @@
-import pygame
+from kivy.uix.image import Image
+
 
 class Boat:
     __MOVE_SPEED = 3
-    __BOAT_WIDTH = 250
-    __BOAT_HEIGHT = 130
+    __BOAT_WIDTH = 180  # Increased from 125
+    __BOAT_HEIGHT = 95  # Increased from 65
 
-    def __init__(self, x=700, y=50):
+    def __init__(self, x=700, y=800):  # Changed y position from 750 to 800 for higher position
         self.x = x
         self.y = y
         self.caught_fishes = 0
-        self.direction = "left"  # กำหนดให้เรือหันซ้ายเป็นค่าเริ่มต้น
-
-    @staticmethod
-    def load_boat():
-        boat_left = pygame.image.load("images/boat_left.png")
-        boat_left = pygame.transform.scale(boat_left, (Boat.__BOAT_WIDTH, Boat.__BOAT_HEIGHT))
-        boat_right = pygame.image.load("images/boat_right.png")
-        boat_right = pygame.transform.scale(boat_right, (Boat.__BOAT_WIDTH, Boat.__BOAT_HEIGHT))
-        return boat_left, boat_right
+        self.texture_left = Image(source='images/boat_left.png').texture
+        self.texture_right = Image(source='images/boat_right.png').texture
+        self.current_texture = self.texture_left
 
     def move_left(self):
         if self.x > 0:
-            self.x -= Boat.__MOVE_SPEED
-            self.direction = "left"  # อัปเดตให้เรือหันไปทางซ้าย
+            self.x -= self.__MOVE_SPEED
+            self.current_texture = self.texture_left
 
     def move_right(self, screen_width: int):
-        if self.x < screen_width - Boat.__BOAT_WIDTH:
-            self.x += Boat.__MOVE_SPEED
-            self.direction = "right"  # อัปเดตให้เรือหันไปทางขวา
+        if self.x < screen_width - self.__BOAT_WIDTH:  # Using new width
+            self.x += self.__MOVE_SPEED
+            self.current_texture = self.texture_right
 
     def caught_fish(self):
         self.caught_fishes += 1

@@ -1,42 +1,34 @@
-import pygame # นำเข้าโมดูล pygame เพื่อใช้สำหรับสร้างเกม
-from boat import Boat # นำเข้าคลาส Boat จากไฟล์ boat.py
-from fishing_line import FishLine # นำเข้าคลาส FishLine จากไฟล์ fishing_line.py
+from kivy.uix.image import Image
+from boat import Boat
+from fishing_line import FishLine
 
 
-class Hook: # สร้างคลาส Hook สำหรับใช้เป็นคลาสของเบ็ด
-    __DROP_SPEED = 4 # กำหนดความเร็วในการตกของเบ็ด
-    __GET_BACK_SPEED = 8 # กำหนดความเร็วในการดึงเบ็ดกลับ
-    __CAUGHT_FISH_SPEED = 2 # กำหนดความเร็วในการดึงปลาขึ้นมา
+class Hook:
+    def __init__(self, boat: Boat):
+        self.texture = Image(source="images/hook.png").texture
+        self.size = (15, 30)
+        self.y_pos = boat.y - 15  # Adjusted for smaller boat
+        self.is_hook_moving = False
+        self.going_down = True
 
-    def __init__(self, boat: Boat): # สร้างเมธอด __init__ สำหรับกำหนดค่าเริ่มต้นของเบ็ด
-        self.picture = pygame.image.load("images/hook.png") # โหลดภาพของเบ็ด
-        self.picture = pygame.transform.scale(self.picture, (15, 30)) # ปรับขนาดของภาพเบ็ด
-        self.y_pos = boat.y + 160 # กำหนดตำแหน่ง y ของเบ็ด
-        self.is_hook_moving = False # กำหนดให้เบ็ดไม่ได้เคลื่อนที่
-        self.bottom_reached = False # กำหนดให้เบ็ดไม่ได้ตกลงสุด
-        self.is_caught = False # กำหนดให้เบ็ดไม่ได้ตกปลา
+    def start_fishing(self):
+        self.is_hook_moving = True
+        self.going_down = True
 
-    def drop_hook(self): # สร้างเมธอด drop_hook สำหรับให้เบ็ดตกลง
-        self.y_pos += Hook.__DROP_SPEED # กำหนดให้เบ็ดตกลง
-        if self.y_pos >= 700: # ถ้าเบ็ดตกลงสมากกว่าหรือเท่ากับความลึก 700
-            self.bottom_reached = True # กำหนดให้เบ็ดตกลงสุด
-            self.is_caught = False # กำหนดให้เบ็ดไม่ได้ตกปลา
+    def reset(self):
+        self.is_hook_moving = False
 
-    def get_hook_back(self, fishing_line: FishLine): # สร้างเมธอด get_hook_back สำหรับดึงเบ็ดกลับ
-        if self.y_pos >= fishing_line.advance_line + 60: # ถ้าตำแหน่ง y ของเบ็ดมากกว่าหรือเท่ากับตำแหน่ง y ของเส้นเบ็ด + 60
-            self.y_pos -= Hook.__GET_BACK_SPEED # กำหนดให้เบ็ดดึงกลับ
+    def update(self, boat: Boat):
+        if not self.is_hook_moving:
+            self.y_pos = boat.y - 15  # Adjusted for smaller boat
+            return
+
+        if self.going_down:
+            self.y_pos -= 5  # Move down instead of up
+            if self.y_pos < 50:  # Stop near bottom
+                self.going_down = False
         else:
-            self.is_hook_moving = False # กำหนดให้เบ็ดไม่ได้เคลื่อนที่
-            self.bottom_reached = False # กำหนดให้เบ็ดไม่ได้ตกลงสุด
-
-    def caught_fish(self, fishing_line: FishLine): # สร้างเมธอด caught_fish สำหรับดึงปลาขึ้นมา
-        if self.y_pos >= fishing_line.advance_line + 60: # ถ้าตำแหน่ง y ของเบ็ดมากกว่าหรือเท่ากับตำแหน่ง y ของเส้นเบ็ด + 60
-            self.y_pos -= Hook.__CAUGHT_FISH_SPEED # กำหนดให้เบ็ดดึงปลาขึ้นมา
-        else:
-            self.is_hook_moving = False # กำหนดให้เบ็ดไม่ได้เคลื่อนที่
-            self.bottom_reached = False # กำหนดให้เบ็ดไม่ได้ตกลงสุด
-            self.is_caught = True # กำหนดให้เบ็ดตกปลา
-
-    def fix_bug_fishing_every_second_time(self): # สร้างเมธอด fix_bug_fishing_every_second_time สำหรับแก้บัคการตกปลาทุกครั้งที่สอง
-        if self.y_pos < 210: # ถ้าตำแหน่ง y ของเบ็ดน้อยกว่า 210
-            self.is_caught = False # กำหนดให้เบ็ดไม่ได้ตกปลา
+            self.y_pos += 5  # Move up for retrieval
+            if self.y_pos > boat.y - 30:
+                self.is_hook_moving = False
+                self.going_down = True

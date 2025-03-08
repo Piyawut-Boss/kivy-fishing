@@ -1,85 +1,84 @@
-import pygame # นำเข้าโมดูล pygame เพื่อใช้สำหรับพัฒนาเกม
-from widgets import Button, TextLabel # นำเข้าคลาส Button และ TextLabel จากโมดูล widgets
+from kivy.uix.screenmanager import Screen
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.core.window import Window
 
-# สีที่ใช้ในเมนู
-MENU_BLUE = (65, 105, 225) 
-MENU_WHITE = (255, 255, 255)
-MENU_HOVER = (100, 149, 237)
-
-# สีที่ใช้ใน AboutPopup
-POPUP_BG = (50, 50, 50)
-POPUP_WHITE = (255, 255, 255)
-POPUP_HOVER = (100, 149, 237)
-
-class AboutPopup: # คลาสสำหรับแสดง pop-up ข้อมูลเกม
-    def __init__(self, screen_size): # สร้างเมธอด __init__ สำหรับกำหนดค่าเริ่มต้นของคลาส
-        self.width, self.height = 400, 300 # กำหนดขนาดของ pop-up
-        self.x = (screen_size[0] - self.width) // 2 # กำหนดตำแหน่ง x ของ pop-up
-        self.y = (screen_size[1] - self.height) // 2 # กำหนดตำแหน่ง y ของ pop-up
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height) # กำหนดพื้นที่ของ pop-up
-        self.title = TextLabel(self.x + 20, self.y + 20, "About the Game", POPUP_WHITE, 36) # กำหนดข้อความหัวของ pop-up
-        self.description = TextLabel(self.x + 20, self.y + 100, "This game was created by  .... .", POPUP_WHITE, 24) # กำหนดข้อความรายละเอียดของ pop-up
-        self.close_button = Button(self.x + 120, self.y + 220, 160, 50, "Close", POPUP_BG, POPUP_HOVER) # กำหนดปุ่มปิด pop-up
-
-    def draw(self, screen): # สร้างเมธอด draw สำหรับวาด pop-up ลงบนหน้าจอ
-        pygame.draw.rect(screen, POPUP_BG, self.rect)  # draw background
-        self.title.draw(screen) # วาดข้อความหัว
-        self.description.draw(screen) # วาดข้อความรายละเอียด
-        self.close_button.draw(screen) # วาดปุ่มปิด
-
-    def handle_mouse(self, pos): # สร้างเมธอด handle_mouse สำหรับจัดการเมื่อเมาส์คลิก
-        self.close_button.is_hovered = self.close_button.rect.collidepoint(pos) # ตรวจสอบว่าเมาส์ชี้ที่ปุ่มปิดหรือไม่
-
-class GameMenu:
-    def __init__(self, screen_size): # สร้างเมธอด __init__ สำหรับกำหนดค่าเริ่มต้นของคลาส
-        self.screen_width, self.screen_height = screen_size # กำหนดความกว้างและความสูงของหน้าจอ
-        self.background_image = pygame.image.load("images/background.png")  # โหลดภาพพื้นหลัง
-        self.background_image = pygame.transform.scale(self.background_image, (self.screen_width, self.screen_height))  # ปรับขนาดภาพให้พอดีกับหน้าจอ
-        self.title = TextLabel(self.screen_width // 2 - 100, 150, "Fisherman", MENU_WHITE, 74) # กำหนดข้อความหัวเรื่อง
-        self.start_button = Button(self.screen_width // 2 - 100, 300, 200, 50, "Start", MENU_BLUE, MENU_HOVER) # กำหนดปุ่มเริ่มเกม
-        self.about_button = Button(self.screen_width // 2 - 100, 400, 200, 50, "About Us", MENU_BLUE, MENU_HOVER) # กำหนดปุ่มเกี่ยวกับเรา
-        self.quit_button = Button(self.screen_width // 2 - 100, 500, 200, 50, "Quit", MENU_BLUE, MENU_HOVER) # กำหนดปุ่มออกจากเกม
+class MenuButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size_hint = (None, None)
+        self.size = (300, 80)
+        self.font_size = '30sp'
+        self.background_normal = ''
+        self.background_color = (0.2, 0.6, 1, 0.8)  # Ocean blue
+        
+        # Add hover effect
+        self.bind(on_enter=self.on_hover_enter)
+        self.bind(on_leave=self.on_hover_leave)
     
-    def draw(self, screen): # สร้างเมธอด draw สำหรับวาดเมนูลงบน
-        screen.blit(self.background_image, (0, 0))  # แสดงภาพพื้นหลัง
-        self.title.draw(screen) # แสดงข้อความหัวเรื่อง
-        self.start_button.draw(screen) # แสดงปุ่มเริ่มเกม
-        self.about_button.draw(screen)  # แสดงปุ่มเกี่ยวกับเรา
-        self.quit_button.draw(screen) # แสดงปุ่มออกจากเกม
+    def on_hover_enter(self, *args):
+        self.background_color = (0.3, 0.7, 1, 1)
+        
+    def on_hover_leave(self, *args):
+        self.background_color = (0.2, 0.6, 1, 0.8)
 
-    def handle_mouse(self, pos): # สร้างเมธอด handle_mouse สำหรับจัดการเมื่อเมาส์คลิก
-        self.start_button.is_hovered = self.start_button.rect.collidepoint(pos) # ตรวจสอบว่าเมาส์ชี้ที่ปุ่มเริ่มเกมหรือไม่
-        self.about_button.is_hovered = self.about_button.rect.collidepoint(pos) # ตรวจสอบว่าเมาส์ชี้ที่ปุ่มเกี่ยวกับเราหรือไม่
-        self.quit_button.is_hovered = self.quit_button.rect.collidepoint(pos) # ตรวจสอบว่าเมาส์ชี้ที่ปุ่มออกจากเกมหรือไม่
-
-# ฟังก์ชันแสดงเมนูหลัก
-def show_menu(screen): # สร้างฟังก์ชัน show_menu สำหรับแสดงเมนูหลัก
-    menu = GameMenu(screen.get_size()) # สร้างเมนู
-    menu_running = True # กำหนดว่าเมนูกำลังทำงาน
-    about_popup = None  # กำหนดว่าไม่มี pop-up ในตอนเริ่มต้น
-
-    while menu_running: # วนลูปเมนู
-        mouse_pos = pygame.mouse.get_pos() # รับตำแหน่งของเมาส์
-        menu.handle_mouse(mouse_pos) # จัดการเมื่อเมาส์คลิก
-
-        if about_popup:  # ถ้ามี Pop-up
-            about_popup.handle_mouse(mouse_pos) # จัดการเมื่อเมาส์คลิก
-            about_popup.draw(screen) # วาด pop-up
-        else:
-            menu.draw(screen) # วาดเมนู
-
-        for event in pygame.event.get(): # ตรวจสอบเหตุการณ์ที่เกิดขึ้น
-            if event.type == pygame.QUIT: # ถ้าเกิดเหตุการณ์การออกจากเกม
-                return "quit" # ออกจากเกม
-            if event.type == pygame.MOUSEBUTTONDOWN: # ถ้าเกิดเหตุการณ์คลิกเมาส์
-                if menu.start_button.rect.collidepoint(event.pos): # ถ้าคลิกที่ปุ่มเริ่มเกม
-                    return "start" # เริ่มเกม
-                if menu.about_button.rect.collidepoint(event.pos): # ถ้าคลิกที่ปุ่มเกี่ยวกับเรา
-                    about_popup = AboutPopup(screen.get_size())  # เปิด pop-up
-                if menu.quit_button.rect.collidepoint(event.pos): # ถ้าคลิกที่ปุ่มออกจากเกม
-                    return "quit" # ออกจากเกม
-                if about_popup and about_popup.close_button.rect.collidepoint(event.pos):  # ปิด pop-up
-                    about_popup = None
-
-        pygame.display.flip() # อัพเดทหน้าจอ
-        pygame.time.Clock().tick(60) # จำกัด FPS ที่ 60
+class AboutPopup(Popup):
+    def __init__(self):
+        super().__init__()
+        self.title = 'About The Game'
+        self.size_hint = (0.6, 0.6)
+        self.content = Label(text='This game was created by ......\n\nUse arrow keys to move\nPress spacebar to fish!')
+        
+class MenuScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = FloatLayout()
+        
+        # Title
+        title = Label(
+            text='Deep Sea\nFishing',
+            font_size=100,
+            bold=True,
+            color=(1, 0.8, 0, 1),  # Gold
+            pos_hint={'center_x': 0.5, 'center_y': 0.7},
+            halign='center'
+        )
+        
+        # Buttons
+        start_btn = MenuButton(
+            text='Start Fishing',
+            pos_hint={'center_x': 0.5, 'center_y': 0.5}
+        )
+        start_btn.bind(on_release=self.start_game)
+        
+        about_btn = MenuButton(
+            text='About',
+            pos_hint={'center_x': 0.5, 'center_y': 0.35}
+        )
+        about_btn.bind(on_release=self.show_about)
+        
+        exit_btn = MenuButton(
+            text='Exit',
+            pos_hint={'center_x': 0.5, 'center_y': 0.2}
+        )
+        exit_btn.bind(on_release=self.exit_game)
+        
+        # Add widgets
+        layout.add_widget(title)
+        layout.add_widget(start_btn)
+        layout.add_widget(about_btn)
+        layout.add_widget(exit_btn)
+        
+        self.add_widget(layout)
+        
+    def start_game(self, *args):
+        self.manager.current = 'game'
+        
+    def show_about(self, *args):
+        AboutPopup().open()
+        
+    def exit_game(self, *args):
+        from kivy.app import App
+        App.get_running_app().stop()
