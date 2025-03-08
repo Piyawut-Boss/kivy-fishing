@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import Enum # ใช้Enum ในการกำหนดสถานะของเกม
 
-class GameState(Enum):
-    MENU = 1
-    PLAYING = 2
-    PAUSED = 3
-    GAME_OVER = 4
+class GameState(Enum): # สร้างคราสที่สืบทอดจาก Enum ในการกำหนดสถานะของเกม
+    MENU = 1 # สถานะเมนู
+    PLAYING = 2 # สถานะเล่นเกม
+    PAUSED = 3 # สถานะเกมหยุด
+    GAME_OVER = 4 # สถานะเกมจบ
 
 class GameStateManager:
     def __init__(self):
