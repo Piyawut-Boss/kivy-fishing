@@ -37,8 +37,17 @@ background = pygame.transform.scale(background, SIZE)  # ปรับขนา�
 boat = Boat() # สร้างเรือ
 
 fishes = [] # สร้างลิสต์เก็บปลา
+# Initialize fish counts
+fish_counts = {"fish": 0, "shark": 0}
+
+# Adjust initial fish spawning to keep track of counts
 for _ in range(5): # วนลูป 5 รอบ
-    fishes.append(spawn_fish()) # เพิ่มปลาเข้าไปในลิสต์
+    fish = spawn_fish()
+    fishes.append(fish)
+    if isinstance(fish, Fish):
+        fish_counts["fish"] += 1
+    else:
+        fish_counts["shark"] += 1
 
 fisherman_line = FishLine(boat) # สร้างเส้นตกปลาจากเรือ
 hook = Hook(boat) # สร้างเบ็ด
@@ -158,9 +167,18 @@ if menu_action == "start": # ถ้าผู้เล่นเลือกเร
                 fishes[caught_fish_index].increase_speed_fish_after_caught() # เพิ่มความเร็วของปลาหลังจับ
                 boat.caught_fish() 
 
+                # Update fish counts
+                if isinstance(fishes[caught_fish_index], Fish):
+                    fish_counts["fish"] -= 1
+                else:
+                    fish_counts["shark"] -= 1
+
                 # แทนที่ปลาตัวที่ถูกจับด้วยตัวใหม่
                 if caught_fish_index is not None and 0 <= caught_fish_index < len(fishes):
-                    fishes[caught_fish_index] = spawn_fish("shark" if isinstance(fishes[caught_fish_index], Shark) else "fish")
+                    new_fish_type = "shark" if fish_counts["shark"] < 2 else "fish"
+                    new_fish = spawn_fish(new_fish_type)
+                    fishes[caught_fish_index] = new_fish
+                    fish_counts[new_fish_type] += 1
 
                 is_fish_caught = False 
                 caught_fish_index = None  # รีเซ็ตค่าให้พร้อมสำหรับรอบต่อไป
