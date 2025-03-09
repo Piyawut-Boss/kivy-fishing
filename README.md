@@ -6,6 +6,7 @@ A simple yet engaging fishing game built with Python and Kivy where players cont
 
 - **Multiple Fish Types:**
   - Regular Fish (1 point)
+  - Tropical Fish (3 points) - Fast and colorful!
   - Sharks (5 points)
   - Different sizes and speeds for each type
 

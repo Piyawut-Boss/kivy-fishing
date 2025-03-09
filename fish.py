@@ -17,6 +17,13 @@ class Fish(Image):
             'size': (180, 120),  # Increased from (120, 80)
             'speed_range': (3, 5),  # Increased from (1, 3)
             'points': 5  # Increased points for catching harder shark
+        },
+        'tropical': {  # New tropical fish type
+            'left': 'images/tropical_left.png',
+            'right': 'images/tropical_right.png',
+            'size': (70, 45),
+            'speed_range': (4, 6),  # Faster than regular fish
+            'points': 3  # Worth more than regular fish but less than shark
         }
     }
 
