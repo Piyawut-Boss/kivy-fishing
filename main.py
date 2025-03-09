@@ -37,8 +37,12 @@ class FishingGame(Widget):
         for _ in range(2):
             self.fishes.append(Fish(800, 200, 'tropical'))
         
-        # Add bombs
-        self.bombs = [Bomb(800, 200) for _ in range(3)]
+        # Add bombs - Reduced from 3 to 1
+        self.bombs = [Bomb(800, 200)]
+        
+        # Add bomb spawn timer
+        self.bomb_spawn_timer = 0
+        self.bomb_spawn_interval = 10  # Spawn new bomb every 10 seconds
         
         # Load background
         self.background_texture = Image(source='images/background.png').texture
@@ -92,6 +96,14 @@ class FishingGame(Widget):
             fish.update(dt)
             if self.hook.is_fishing and self.hook.check_collision(fish):
                 self.handle_catch(fish)
+        
+        # Update bomb spawn timer
+        self.bomb_spawn_timer += dt
+        if self.bomb_spawn_timer >= self.bomb_spawn_interval:
+            self.bomb_spawn_timer = 0
+            for bomb in self.bombs:
+                if random.random() < 0.3:  # 30% chance to respawn
+                    bomb.respawn()
         
         # Update bombs and check collisions
         for bomb in self.bombs:

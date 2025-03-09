@@ -25,6 +25,8 @@ class Bomb:
 
     def respawn(self):
         self.x_pos = random.randint(100, Window.width - 100)
-        self.y_pos = random.randint(100, 300)
-        self.speed = random.uniform(2, 4)
+        self.y_pos = random.randint(100, 400)  # Slightly higher range
+        self.speed = random.uniform(1, 3)  # Slightly slower
         self.moving_right = random.choice([True, False])
+        # Add a random delay before the bomb becomes active
+        self.x_pos = -100 if self.moving_right else Window.width + 100
