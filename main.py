@@ -13,6 +13,7 @@ from info_json import *
 from score_display import ScoreDisplay
 from menu import MenuScreen  # Only import MenuScreen
 from bomb import Bomb
+from game_over_screen import GameOverScreen
 
 class FishingGame(Widget):
     def __init__(self, **kwargs):
@@ -126,13 +127,16 @@ class FishingGame(Widget):
             save_on_close(self.json_data, self.boat.caught_fishes)
 
     def handle_bomb_collision(self, bomb):
-        # Reduce score when hitting a bomb
-        current_score = max(0, self.boat.caught_fishes + bomb.points)
-        self.boat.caught_fishes = current_score
-        self.score_display.update_score(current_score)
-        self.score_display.update_fish_count(current_score)
-        bomb.respawn()
-        self.hook.reset()
+        # Get the screen manager
+        app = App.get_running_app()
+        sm = app.root
+        
+        # Update game over screen with final score
+        game_over_screen = sm.get_screen('game_over')
+        game_over_screen.update_score(self.boat.caught_fishes)
+        
+        # Switch to game over screen
+        sm.current = 'game_over'
 
     def draw(self):
         self.canvas.clear()
@@ -185,6 +189,7 @@ class FishermanApp(App):
         sm = ScreenManager()
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(GameScreen(name='game'))
+        sm.add_widget(GameOverScreen(name='game_over'))
         return sm
 
 if __name__ == '__main__':
