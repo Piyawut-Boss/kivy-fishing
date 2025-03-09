@@ -1,55 +1,54 @@
-# Fisherman Game
+# Fishing Game
 
-A 2D fishing game built with Pygame where you control a boat and catch different types of fish at various depths.
+A simple yet engaging fishing game built with Python and Kivy where players control a boat and try to catch fish while avoiding bombs.
 
 ## Game Features
 
-### Controls
-- Left Arrow/A: Move boat left
-- Right Arrow/D: Move boat right
-- Space: Drop/Retrieve fishing hook
+- **Multiple Fish Types:**
+  - Regular Fish (1 point)
+  - Sharks (5 points)
+  - Different sizes and speeds for each type
 
-### Fish Types & Points
-- Common Fish: 1 point (Surface level)
-- Rare Fish: 3 points (Medium depth)
-- Legendary Fish: 5 points (Deep water)
+- **Obstacles:**
+  - Bombs that end the game if caught
+  - Moving obstacles that require timing and skill
 
-### Depth Mechanics
-- Surface Water (0-300 depth)
-  - 95% common fish
-  - 5% rare fish
-- Medium Depth (301-500)
-  - 40% common fish
-  - 40% rare fish
-  - 20% legendary fish
-- Deep Water (501+)
-  - 30% common fish
-  - 30% rare fish
-  - 40% legendary fish
+- **Scoring System:**
+  - Points based on fish type
+  - High score tracking
+  - Current catch counter
 
-### Game Elements
-- Depth Meter: Shows current hook depth
-- Fish Counter: Tracks caught fish
-- Record System: Keeps track of your best score
-- Timer: Shows elapsed time
-- Fish Statistics: Shows counts of each fish type caught
+## How to Play
 
-### Gameplay Mechanics
-- Fish swim in patterns and change direction at screen edges
-- Deeper waters offer better chances for rare fish
-- Fish speed increases after each catch
-- Game ends after catching 10 fish
+1. **Controls:**
+   - Left Arrow / 'A': Move boat left
+   - Right Arrow / 'D': Move boat right
+   - Spacebar: Drop/Raise fishing hook
 
-## Technical Details
-- Built with Python and Pygame
-- Uses Widget system for UI elements
-- Event-driven architecture
-- State management system
+2. **Gameplay:**
+   - Guide your boat across the water
+   - Drop your hook to catch fish
+   - Regular fish are worth 1 point
+   - Sharks are worth 5 points
+   - Avoid catching bombs - they end the game!
+
+3. **Game Over:**
+   - Game ends if you catch a bomb
+   - View your final score
+   - Choose to play again or return to menu
+
+## Installation
+
+1. Ensure you have Python and Kivy installed
+2. Clone the repository
+3. Run `python main.py` to start the game
 
 ## Requirements
-- Python 3.x
-- Pygame 2.x
 
-## How to Run
-```bash
-python main.py
+- Python 3.x
+- Kivy 2.0.0 or higher
+
+## Credits
+
+Created by [Your Name]
+Graphics and sound effects from [Source]
