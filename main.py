@@ -19,9 +19,17 @@ class FishingGame(Widget):
         
         # Initialize game objects
         self.boat = Boat()
-        self.fishes = [Fish(800, 200) for _ in range(5)]
         self.hook = Hook(self.boat)
         self.json_data = read_json()
+        
+        # Create mixed fish population
+        self.fishes = []
+        # Add regular fish
+        for _ in range(4):
+            self.fishes.append(Fish(800, 200, 'regular'))
+        # Add sharks
+        for _ in range(2):
+            self.fishes.append(Fish(800, 200, 'shark'))
         
         # Load background
         self.background_texture = Image(source='images/background.png').texture
@@ -80,8 +88,11 @@ class FishingGame(Widget):
 
     def handle_catch(self, caught_fish):
         self.boat.caught_fish()
-        # Update scores with animation
-        self.score_display.update_score(self.boat.caught_fishes, animate=True)
+        # Update scores with points based on fish type
+        self.score_display.update_score(
+            self.boat.caught_fishes * caught_fish.points, 
+            animate=True
+        )
         self.score_display.update_fish_count(self.boat.caught_fishes)
         
         # Respawn caught fish
@@ -119,11 +130,11 @@ class FishingGame(Widget):
                      pos=(self.boat.x + 85, self.hook.y_pos),
                      size=self.hook.size)
             
-            # Draw all fish
+            # Draw all fish with their proper sizes
             for fish in self.fishes:
                 Rectangle(texture=fish.current_texture,
                          pos=(fish.x_pos, fish.y_pos),
-                         size=(60, 40))  # Reduced from (120, 80)
+                         size=fish.size)  # Use fish's individual size
             
             # Make sure score display is always visible
             self.score_display.pos = (0, 0)
