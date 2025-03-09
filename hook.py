@@ -1,7 +1,6 @@
 from kivy.uix.image import Image
 from kivy.properties import BooleanProperty, NumericProperty
 from boat import Boat
-from fishing_line import FishLine
 
 class Hook(Image):
     is_fishing = BooleanProperty(False)
@@ -31,7 +30,8 @@ class Hook(Image):
             self.y -= self.speed
             if self.y < 50:
                 self.is_fishing = False
-                
+
     def check_collision(self, fish):
-        return (abs(self.x - fish.x) < 30 and 
-                abs(self.y - fish.y) < 30)
+        """ ตรวจจับการชนกันของเบ็ดและปลา ให้ง่ายขึ้น """
+        return (abs(self.x - fish.x_pos) < fish.size[0] * 0.8 and 
+                abs(self.y - fish.y_pos) < fish.size[1] * 0.8)
