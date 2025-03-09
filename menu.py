@@ -4,6 +4,8 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.core.window import Window
+from kivy.uix.image import Image
+from kivy.graphics import Rectangle
 
 class MenuButton(Button):
     def __init__(self, **kwargs):
@@ -35,6 +37,12 @@ class MenuScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = FloatLayout()
+        
+        # Load background
+        self.background_texture = Image(source='images/background.png').texture
+        
+        with self.canvas.before:
+            Rectangle(texture=self.background_texture, pos=self.pos, size=Window.size)
         
         # Title
         title = Label(
