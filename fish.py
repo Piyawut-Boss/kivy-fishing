@@ -9,21 +9,24 @@ class Fish(Image):
             'right': 'images/fish_1_right.png',
             'size': (60, 40),
             'speed_range': (2, 4),
-            'points': 1
+            'points': 1,
+            'height_range': (400, 600),  # Higher swimming range for regular fish
         },
         'shark': {
             'left': 'images/shark_left.png',
             'right': 'images/shark_right.png',
             'size': (180, 120),  # Increased from (120, 80)
             'speed_range': (3, 5),  # Increased from (1, 3)
-            'points': 5  # Increased points for catching harder shark
+            'points': 5,  # Increased points for catching harder shark
+            'height_range': (100, 300),  # Keep sharks at lower depth
         },
         'tropical': {  # New tropical fish type
             'left': 'images/tropical_left.png',
             'right': 'images/tropical_right.png',
             'size': (70, 45),
             'speed_range': (4, 6),  # Faster than regular fish
-            'points': 3  # Worth more than regular fish but less than shark
+            'points': 3,  # Worth more than regular fish but less than shark
+            'height_range': (500, 700),  # Highest swimming range for tropical fish
         }
     }
 
@@ -54,8 +57,10 @@ class Fish(Image):
             self.fish_type = fish_type  # Update fish type if passed
 
         speed_min, speed_max = self.FISH_TYPES[self.fish_type]['speed_range']
+        height_min, height_max = self.FISH_TYPES[self.fish_type]['height_range']
+        
         self.x_pos = random.randint(100, Window.width - 100)
-        self.y_pos = random.randint(100, 300)
+        self.y_pos = random.randint(height_min, height_max)  # Use type-specific height range
         self.speed = random.uniform(speed_min, speed_max)
         self.moving_right = random.choice([True, False])
         
