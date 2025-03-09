@@ -47,6 +47,12 @@ class FishingGame(Widget):
         self._keyboard.bind(on_key_down=self._on_key_down)
         self._keyboard.bind(on_key_up=self._on_key_up)
         self.pressed_keys = set()
+
+        # Add label to display caught fish count
+        from kivy.uix.label import Label
+        self.caught_fish_count = 0  # Initialize the fish count
+        self.fish_count_label = Label(text=f"Fish caught: {self.caught_fish_count}", pos=(10, Window.height - 30), font_size=20)
+        self.add_widget(self.fish_count_label)
         
         Clock.schedule_interval(self.update, 1.0/60.0)
 
@@ -88,12 +94,17 @@ class FishingGame(Widget):
 
     def handle_catch(self, caught_fish):
         self.boat.caught_fish()
+        self.caught_fish_count += 1  # Increment the caught fish count
+        
         # Update scores with points based on fish type
         self.score_display.update_score(
             self.boat.caught_fishes * caught_fish.points, 
             animate=True
         )
         self.score_display.update_fish_count(self.boat.caught_fishes)
+        
+        # Update the caught fish count label
+        self.fish_count_label.text = f"Fish caught: {self.caught_fish_count}"
         
         # Respawn caught fish with random type
         new_fish_type = random.choice(['regular', 'shark'])  # Randomly choose between 'regular' and 'shark'
