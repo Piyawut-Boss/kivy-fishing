@@ -57,6 +57,3 @@ A fun and challenging fishing game where you control a boat, catch different typ
    - View your final score
    - Choose to play again, return to menu, or quit
 
-## 🛠️ Installation
-
-1. Requirements:
