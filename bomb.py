@@ -5,7 +5,7 @@ import random
 class Bomb:
     def __init__(self, x, y):
         self.texture = Image(source='images/bomb.png').texture
-        self.size = (40, 40)
+        self.size = (80, 80)  # Increased from (40, 40)
         self.x_pos = x
         self.y_pos = y
         self.speed = random.uniform(2, 4)
