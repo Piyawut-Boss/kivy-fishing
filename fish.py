@@ -27,6 +27,14 @@ class Fish(Image):
             'speed_range': (4, 6),  # Faster than regular fish
             'points': 3,  # Worth more than regular fish but less than shark
             'height_range': (500, 700),  # Highest swimming range for tropical fish
+        },
+        'yellow_speed': {  # New fast yellow fish type
+            'left': 'images/yellow_fish_left.png',
+            'right': 'images/yellow_fish_right.png',
+            'size': (50, 35),  # Smaller size for speed
+            'speed_range': (6, 8),  # Very fast speed
+            'points': 10,  # High points for catching
+            'height_range': (300, 500)  # Mid-water height range
         }
     }
 

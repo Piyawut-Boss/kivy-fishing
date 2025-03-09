@@ -36,6 +36,8 @@ class FishingGame(Widget):
         # Add tropical fish
         for _ in range(2):
             self.fishes.append(Fish(800, 200, 'tropical'))
+        # Add yellow speed fish
+        self.fishes.append(Fish(800, 200, 'yellow_speed'))  # Only one because it's special
         
         # Add bombs - Reduced from 3 to 1
         self.bombs = [Bomb(800, 200)]
@@ -131,7 +133,7 @@ class FishingGame(Widget):
         self.fish_count_label.text = f"Fish caught: {self.caught_fish_count}"
         
         # Respawn caught fish with random type
-        new_fish_type = random.choice(['regular', 'shark', 'tropical'])  # Randomly choose between 'regular', 'shark', and 'tropical'
+        new_fish_type = random.choice(['regular', 'shark', 'tropical', 'yellow_speed'])  # Randomly choose between 'regular', 'shark', 'tropical', and 'yellow_speed'
         caught_fish.respawn(fish_type=new_fish_type)  # Pass the random type to respawn
         self.hook.reset()
         
