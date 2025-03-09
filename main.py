@@ -51,7 +51,7 @@ class FishingGame(Widget):
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_key_down)
-        self._keyboard.unbind(on_key_up=self._on_key_up)
+        self._keyboard.unbind(on_key_up(self._on_key_up))
         self._keyboard = None
 
     def _on_key_down(self, keyboard, keycode, text, modifiers):
@@ -76,13 +76,12 @@ class FishingGame(Widget):
         for fish in self.fishes:
             fish.update(dt)
             # Check collision for each fish
-            if self.hook.is_hook_moving:
-                if (abs(self.boat.x + 115 - fish.x_pos) < 60 and
-                    abs(self.hook.y_pos - fish.y_pos) < 40):
+            if self.hook.is_fishing:
+                if self.hook.check_collision(fish):
                     self.handle_catch(fish)
         
         # Update hook
-        self.hook.update(self.boat)
+        self.hook.update()
                 
         self.draw()
 
@@ -120,14 +119,14 @@ class FishingGame(Widget):
             # Adjust fishing line for bigger boat
             Color(1, 0, 0)
             Line(points=[self.boat.x + 90, self.boat.y + 20,
-                        self.boat.x + 90, self.hook.y_pos])
+                        self.boat.x + 90, self.hook.y])
             
             # Reset color to white before drawing sprites
             Color(1, 1, 1, 1)  # White color, full opacity
             
             # Adjust hook position for bigger boat
             Rectangle(texture=self.hook.texture,
-                     pos=(self.boat.x + 85, self.hook.y_pos),
+                     pos=(self.boat.x + 85, self.hook.y),
                      size=self.hook.size)
             
             # Draw all fish with their proper sizes

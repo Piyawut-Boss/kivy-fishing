@@ -1,34 +1,37 @@
 from kivy.uix.image import Image
+from kivy.properties import BooleanProperty, NumericProperty
 from boat import Boat
 from fishing_line import FishLine
 
-
-class Hook:
-    def __init__(self, boat: Boat):
-        self.texture = Image(source="images/hook.png").texture
+class Hook(Image):
+    is_fishing = BooleanProperty(False)
+    speed = NumericProperty(4)
+    
+    def __init__(self, boat, **kwargs):
+        super().__init__(**kwargs)
+        self.source = 'images/hook.png'
+        self.size_hint = (None, None)
         self.size = (15, 30)
-        self.y_pos = boat.y - 15  # Adjusted for smaller boat
-        self.is_hook_moving = False
-        self.going_down = True
-
-    def start_fishing(self):
-        self.is_hook_moving = True
-        self.going_down = True
-
+        self.boat = boat
+        self.reset()
+        
     def reset(self):
-        self.is_hook_moving = False
-
-    def update(self, boat: Boat):
-        if not self.is_hook_moving:
-            self.y_pos = boat.y - 15  # Adjusted for smaller boat
-            return
-
-        if self.going_down:
-            self.y_pos -= 5  # Move down instead of up
-            if self.y_pos < 50:  # Stop near bottom
-                self.going_down = False
+        self.pos = (self.boat.x + 85, self.boat.y - 30)
+        self.is_fishing = False
+        
+    def start_fishing(self):
+        if not self.is_fishing:
+            self.is_fishing = True
+            
+    def update(self):
+        if not self.is_fishing:
+            self.x = self.boat.x + 85
+            self.y = self.boat.y - 30
         else:
-            self.y_pos += 5  # Move up for retrieval
-            if self.y_pos > boat.y - 30:
-                self.is_hook_moving = False
-                self.going_down = True
+            self.y -= self.speed
+            if self.y < 50:
+                self.is_fishing = False
+                
+    def check_collision(self, fish):
+        return (abs(self.x - fish.x) < 30 and 
+                abs(self.y - fish.y) < 30)

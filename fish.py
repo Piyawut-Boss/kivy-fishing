@@ -2,7 +2,7 @@ from kivy.uix.image import Image
 from kivy.core.window import Window
 import random
 
-class Fish:
+class Fish(Image):
     FISH_TYPES = {
         'regular': {
             'left': 'images/fish_1_left.png',
@@ -21,6 +21,7 @@ class Fish:
     }
 
     def __init__(self, x, y, fish_type='regular'):
+        super().__init__()
         self.fish_type = fish_type
         self.texture_left = Image(source=self.FISH_TYPES[fish_type]['left']).texture
         self.texture_right = Image(source=self.FISH_TYPES[fish_type]['right']).texture
