@@ -12,6 +12,7 @@ from hook import Hook
 from info_json import *
 from score_display import ScoreDisplay
 from menu import MenuScreen  # Only import MenuScreen
+from bomb import Bomb
 
 class FishingGame(Widget):
     def __init__(self, **kwargs):
@@ -31,6 +32,9 @@ class FishingGame(Widget):
         # Add sharks
         for _ in range(2):
             self.fishes.append(Fish(800, 200, 'shark'))
+        
+        # Add bombs
+        self.bombs = [Bomb(800, 200) for _ in range(3)]
         
         # Load background
         self.background_texture = Image(source='images/background.png').texture
@@ -79,13 +83,17 @@ class FishingGame(Widget):
         if ('right' in self.pressed_keys or 'd' in self.pressed_keys):
             self.boat.move_right(Window.width)
             
-        # Update all fish
+        # Update all fish and check collisions
         for fish in self.fishes:
             fish.update(dt)
-            # Check collision for each fish
-            if self.hook.is_fishing:
-                if self.hook.check_collision(fish):
-                    self.handle_catch(fish)
+            if self.hook.is_fishing and self.hook.check_collision(fish):
+                self.handle_catch(fish)
+        
+        # Update bombs and check collisions
+        for bomb in self.bombs:
+            bomb.update(dt)
+            if self.hook.is_fishing and self.hook.check_collision(bomb):
+                self.handle_bomb_collision(bomb)
         
         # Update hook
         self.hook.update()
@@ -117,6 +125,15 @@ class FishingGame(Widget):
             self.score_display.update_high_score(self.json_data["best_result"])
             save_on_close(self.json_data, self.boat.caught_fishes)
 
+    def handle_bomb_collision(self, bomb):
+        # Reduce score when hitting a bomb
+        current_score = max(0, self.boat.caught_fishes + bomb.points)
+        self.boat.caught_fishes = current_score
+        self.score_display.update_score(current_score)
+        self.score_display.update_fish_count(current_score)
+        bomb.respawn()
+        self.hook.reset()
+
     def draw(self):
         self.canvas.clear()
         with self.canvas:
@@ -147,6 +164,12 @@ class FishingGame(Widget):
                 Rectangle(texture=fish.current_texture,
                          pos=(fish.x_pos, fish.y_pos),
                          size=fish.size)  # Use fish's individual size
+            
+            # Draw bombs after fish
+            for bomb in self.bombs:
+                Rectangle(texture=bomb.texture,
+                         pos=(bomb.x_pos, bomb.y_pos),
+                         size=bomb.size)
             
             # Make sure score display is always visible
             self.score_display.pos = (0, 0)
