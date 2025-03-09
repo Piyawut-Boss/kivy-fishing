@@ -1,3 +1,4 @@
+import random  # เพิ่มการ import random
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
@@ -94,8 +95,9 @@ class FishingGame(Widget):
         )
         self.score_display.update_fish_count(self.boat.caught_fishes)
         
-        # Respawn caught fish
-        caught_fish.respawn()
+        # Respawn caught fish with random type
+        new_fish_type = random.choice(['regular', 'shark'])  # Randomly choose between 'regular' and 'shark'
+        caught_fish.respawn(fish_type=new_fish_type)  # Pass the random type to respawn
         self.hook.reset()
         
         # Update high score if needed

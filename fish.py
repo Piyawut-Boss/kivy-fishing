@@ -28,7 +28,7 @@ class Fish(Image):
         self.current_texture = self.texture_left
         self.size = self.FISH_TYPES[fish_type]['size']
         self.points = self.FISH_TYPES[fish_type]['points']
-        self.respawn()
+        self.respawn(fish_type)  # Ensure we call respawn with fish_type
 
     def update(self, dt):
         if self.moving_right:
@@ -42,9 +42,19 @@ class Fish(Image):
             if self.x_pos < 0:
                 self.moving_right = True
                 
-    def respawn(self):
+    def respawn(self, fish_type=None):
+        if fish_type:
+            self.fish_type = fish_type  # Update fish type if passed
+
         speed_min, speed_max = self.FISH_TYPES[self.fish_type]['speed_range']
         self.x_pos = random.randint(100, Window.width - 100)
         self.y_pos = random.randint(100, 300)
         self.speed = random.uniform(speed_min, speed_max)
         self.moving_right = random.choice([True, False])
+        
+        # Update texture and size after respawning
+        self.texture_left = Image(source=self.FISH_TYPES[self.fish_type]['left']).texture
+        self.texture_right = Image(source=self.FISH_TYPES[self.fish_type]['right']).texture
+        self.size = self.FISH_TYPES[self.fish_type]['size']
+        self.points = self.FISH_TYPES[self.fish_type]['points']
+        self.current_texture = self.texture_left
