@@ -30,7 +30,7 @@ class AboutPopup(Popup):
         super().__init__()
         self.title = 'About The Game'
         self.size_hint = (0.6, 0.6)
-        self.content = Label(text='Deep Sea Fishing Game\n\nUse arrow keys to move\nPress spacebar to fish!')
+        self.content = Label(text='Deep Sea Fishing Game\n\n6710110257\n6710110264\nPress spacebar to fish!')
 
 class MenuScreen(Screen):
     def __init__(self, **kwargs):
