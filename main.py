@@ -14,6 +14,8 @@ from score_display import ScoreDisplay
 from menu import MenuScreen  # Only import MenuScreen
 from bomb import Bomb
 from game_over_screen import GameOverScreen
+from sound_manager import SoundManager
+from volume_control_buttons import VolumeControlButton
 
 class FishingGame(Widget):
     def __init__(self, **kwargs):
@@ -203,10 +205,18 @@ class GameScreen(Screen):
 
 class FishermanApp(App):
     def build(self):
+        self.sound_manager = SoundManager()  # สร้างอินสแตนซ์ของ SoundManager
+        self.sound_manager.play_music()  # เล่นเพลงพื้นหลัง
+        
         sm = ScreenManager()
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(GameScreen(name='game'))
         sm.add_widget(GameOverScreen(name='game_over'))
+        
+        # เพิ่มปุ่มเปิด/ปิดเสียง
+        volume_button = VolumeControlButton(self.sound_manager)
+        sm.get_screen('game').add_widget(volume_button)
+        
         return sm
 
 if __name__ == '__main__':
