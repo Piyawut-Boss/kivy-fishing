@@ -122,6 +122,7 @@ class FishingGame(Widget):
         self.draw()
 
     def handle_catch(self, caught_fish):
+        self.sound_manager = SoundManager()
         self.boat.caught_fish()
         self.caught_fish_count += 1  # Increment the caught fish count
         
@@ -139,6 +140,9 @@ class FishingGame(Widget):
         new_fish_type = random.choice(['regular', 'shark', 'tropical', 'yellow_speed'])  # Randomly choose between 'regular', 'shark', 'tropical', and 'yellow_speed'
         caught_fish.respawn(fish_type=new_fish_type)  # Pass the random type to respawn
         self.hook.reset()
+        
+        # Play sound when fish is caught
+        self.sound_manager.play_fish_catch_sound()
         
         # Update high score if needed
         if self.boat.caught_fishes > self.json_data["best_result"]:
