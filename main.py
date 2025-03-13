@@ -16,6 +16,7 @@ from bomb import Bomb
 from game_over_screen import GameOverScreen
 from sound_manager import SoundManager
 from volume_control_buttons import VolumeControlButton
+from kivy.uix.floatlayout import FloatLayout
 
 class FishingGame(Widget):
     def __init__(self, **kwargs):
@@ -214,8 +215,13 @@ class FishermanApp(App):
         sm.add_widget(GameOverScreen(name='game_over'))
         
         # เพิ่มปุ่มเปิด/ปิดเสียง
+        game_screen = sm.get_screen('game')
+        layout = FloatLayout()
+        
         volume_button = VolumeControlButton(self.sound_manager)
-        sm.get_screen('game').add_widget(volume_button)
+        layout.add_widget(volume_button) 
+        
+        game_screen.add_widget(layout)
         
         return sm
 
