@@ -17,6 +17,7 @@ from game_over_screen import GameOverScreen
 from sound_manager import SoundManager
 from volume_control_buttons import VolumeControlButton
 from kivy.uix.floatlayout import FloatLayout
+from fish_count_display import FishCountDisplay
 
 class FishingGame(Widget):
     def __init__(self, **kwargs):
@@ -27,7 +28,6 @@ class FishingGame(Widget):
         self.boat = Boat()
         self.hook = Hook(self.boat)
         self.json_data = read_json()
-        
         # Create mixed fish population
         self.fishes = []
         # Add regular fish
@@ -73,9 +73,10 @@ class FishingGame(Widget):
         
         Clock.schedule_interval(self.update, 1.0/60.0)
 
+
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_key_down)
-        self._keyboard.unbind(on_key_up(self._on_key_up))
+        self._keyboard.unbind(on_key_up=self._on_key_up)
         self._keyboard = None
 
     def _on_key_down(self, keyboard, keycode, text, modifiers):
@@ -207,7 +208,9 @@ class GameScreen(Screen):
         super().__init__(**kwargs)
         self.game = FishingGame()
         self.add_widget(self.game)
-
+        
+        self.fish_count_display = FishCountDisplay(self.game)
+        self.add_widget(self.fish_count_display)
 class FishermanApp(App):
     def build(self):
         self.sound_manager = SoundManager()  # สร้างอินสแตนซ์ของ SoundManager
@@ -217,7 +220,6 @@ class FishermanApp(App):
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(GameScreen(name='game'))
         sm.add_widget(GameOverScreen(name='game_over'))
-        
         # เพิ่มปุ่มเปิด/ปิดเสียง
         game_screen = sm.get_screen('game')
         layout = FloatLayout()
