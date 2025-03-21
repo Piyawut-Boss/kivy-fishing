@@ -57,3 +57,8 @@ A fun and challenging fishing game where you control a boat, catch different typ
    - View your final score
    - Choose to play again, return to menu, or quit
 
+### Group members
+1.Tanatan pruksakosol 6710110169
+2.Pantita prapassornwattana 6710110257
+3.piyawut muangjuntaburee 6710110264
+
